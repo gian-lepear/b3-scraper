@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "cblol-scraper"
+name = "league-scraper"
 version = "0.1.0"
 description = ""
 authors = ["Your Name <you@example.com>"]
 readme = "README.md"
-packages = [{include = "cblol_scraper"}]
+packages = [{include = "league_scraper"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
