@@ -1,4 +1,5 @@
 import zipfile
+from datetime import datetime
 from pathlib import Path
 
 import httpx
@@ -31,7 +32,15 @@ def unzip_file(zip_path: Path) -> None:
 
 
 if __name__ == "__main__":
-    month_range = pd.date_range("2024-02-01", "2024-02-29", freq="MS").strftime("%m%Y").tolist()
+    month_range = (
+        pd.date_range(
+            "2020-01-01",
+            datetime.today(),
+            freq="MS",
+        )
+        .strftime("%m%Y")
+        .tolist()
+    )
     for month in month_range:
         zip_path = download_file(month)
         unzip_file(zip_path)

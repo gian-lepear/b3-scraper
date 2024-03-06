@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
@@ -69,20 +70,20 @@ B3_COTAHIST_ARGS = {
         "ESPECI": "category",
         "PRAZOT": "object",
         "MODREF": "object",
-        "PREABE": "float64",
-        "PREMAX": "float64",
-        "PREMIN": "float64",
-        "PREMED": "float64",
-        "PREULT": "float64",
-        "PREOFC": "float64",
-        "PREOFV": "float64",
+        "PREABE": "int64",
+        "PREMAX": "int64",
+        "PREMIN": "int64",
+        "PREMED": "int64",
+        "PREULT": "int64",
+        "PREOFC": "int64",
+        "PREOFV": "int64",
         "TOTNEG": "int64",
         "QUATOT": "int64",
-        "VOLTOT": "float64",
-        "PREEXE": "float64",
+        "VOLTOT": "int64",
+        "PREEXE": "int64",
         "INDOPC": "int64",
         "DATVEN": "int64",
-        "FATCOT": "float64",
+        "FATCOT": "int64",
         "POTEXE": "float64",
         "CODISI": "object",
         "DISMES": "int64",
@@ -102,7 +103,16 @@ def read_file(file_path: Path) -> pd.DataFrame:
         encoding="ISO-8859-1",
         engine="pyarrow",
     )
-    df = df[df["CODBDI"] == "02"].reset_index(drop=True)
+
+    filter_condition = (
+        df["ESPECI"].str.contains(
+            "ON|PN|PNB|PNA",
+            regex=True,
+            case=False,
+        )
+    ) & (df["CODBDI"] == "02")
+
+    df = df[filter_condition].reset_index(drop=True)
     return df
 
 
@@ -114,23 +124,13 @@ def save_data(df: pd.DataFrame, file_name: str) -> None:
     df.to_parquet(compressed_path / file_name, compression="snappy")
 
 
-def read_data():
-    compressed_path = Path("files/stocks/compressed")
-    return pd.read_parquet(
-        compressed_path / "data.parquet",
-        engine="fastparquet",
-    )
-
-
 if __name__ == "__main__":
-    # extracted_path = Path("files/stocks/extracted")
-    # dfs = []
-    # for file_path in extracted_path.iterdir():
-    #     tmp_df = read_file(file_path)
-    #     dfs.append(tmp_df)
+    extracted_path = Path("files/stocks/extracted")
+    dfs = []
+    for file_path in extracted_path.iterdir():
+        tmp_df = read_file(file_path)
+        dfs.append(tmp_df)
 
-    # df = pd.concat(dfs)
-    # save_data(df, "data")
-    df = read_data()
-    print(df.head())
-    print(df.shape)
+    df = pd.concat(dfs)
+    today = datetime.today().strftime("%Y%m%d")
+    save_data(df, f"data_{today}")
