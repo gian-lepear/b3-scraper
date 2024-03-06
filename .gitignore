@@ -162,3 +162,5 @@ cython_debug/
 #Custom
 .ruff_cache/
 postgres-data/
+files/stocks/
+*.csv
